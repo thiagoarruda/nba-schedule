@@ -41,9 +41,9 @@ export default function Home() {
         <div className="flex flex-wrap">
           {!gamesToday && <p className="w-full text-center">Nenhuma transmissão nesta data</p>}
           {gamesToday &&
-            gamesToday.map((game: any) => {
+            gamesToday.map((game: any, index: number) => {
               return (
-                <div className="w-full shadow-md rounded-xl bg-gray-100 text-middle mb-5 mx-4 p-4">
+                <div key={`game-card-${index}`}className="w-full shadow-md rounded-xl bg-gray-100 text-middle mb-5 mx-4 p-4">
                   <div className="grid grid-cols-3 gap-4 text-center items-center">
                     <span className="text-sm">{game.home_team}</span>
                     <span className="text-2xl font-bold">{game.time}</span>
