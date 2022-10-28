@@ -58,17 +58,18 @@ export default function Home() {
                 <div key={`game-card-${index}`} className="w-full shadow-md rounded-xl bg-gray-100 text-middle mb-5 mx-4 p-4">
                   <div className="grid grid-cols-3 gap-4 text-center items-center">
                     <div className="flex flex-col items-center">
-                      <img className="h-16 w-16" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} ></img>
+                      <Image className="h-16 w-16" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} width={200} height={200}></Image>
                       <span className="font-semibold">{homeTeam.shortName}</span>
                     </div>
                     <span className="text-2xl font-bold">{game.time}</span>
                     <div className="flex flex-col items-center">
-                      <img className="h-16 w-16" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} ></img>
+                      <Image className="h-16 w-16" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
                       <span className="font-semibold">{awayTeam.shortName}</span>
                     </div>
                   </div>
-                  <p className="w-full text-center mt-4 text-xs">{game.channels.join(', ')}</p>
-
+                  <div className="text-center">
+                    <span className="w-full  mt-4 text-xs">{game.channels.join(', ')}</span>
+                  </div>
                 </div>
               )
             })
