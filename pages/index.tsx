@@ -40,7 +40,7 @@ export default function Home() {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <div className="w-full">
-        <div className="flex justify-center px-4 mb-8">
+        <div className="flex justify-center px-4 mb-8 text-gray-100">
           <button className="flex-none px-3 text-3xl" onClick={() => setCurrentDate(previousDay(currentDate))}>{"<"}</button>
           <div className="flex flex-col grow items-center">
             <h1 className="text-3xl font-semibold text-center">{dayjs(currentDate).format('DD/MM/YYYY')}</h1>
@@ -49,26 +49,26 @@ export default function Home() {
           <button className="flex-none px-3 text-3xl" onClick={() => setCurrentDate(nextDay(currentDate))}>{">"}</button>
         </div>
         <div className="flex flex-wrap">
-          {!gamesToday && <p className="w-full text-center">Nenhuma transmissão nesta data</p>}
+          {!gamesToday && <p className="w-full text-center text-gray-100">Nenhuma transmissão nesta data</p>}
           {gamesToday &&
             gamesToday.map((game, index: number) => {
               const homeTeam = Teams.getTeam(game.homeTeam);
               const awayTeam = Teams.getTeam(game.awayTeam);
               return (
-                <div key={`game-card-${index}`} className="w-full shadow-md rounded-xl bg-gray-100 text-middle mb-5 mx-4 p-4">
+                <div key={`game-card-${index}`} className="w-full text-gray-100 rounded-xl bg-slate-900 text-middle mb-5 mx-4 p-4">
                   <div className="grid grid-cols-3 gap-4 text-center items-center">
                     <div className="flex flex-col items-center">
                       <Image className="h-16 w-16" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} width={200} height={200}></Image>
-                      <span className="font-semibold">{homeTeam.shortName}</span>
+                      <span className="text-sm mt-2 font-semibold">{homeTeam.shortName}</span>
                     </div>
                     <span className="text-2xl font-bold">{game.time}</span>
                     <div className="flex flex-col items-center">
                       <Image className="h-16 w-16" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
-                      <span className="font-semibold">{awayTeam.shortName}</span>
+                      <span className="text-sm mt-2 font-semibold">{awayTeam.shortName}</span>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <span className="w-full  mt-4 text-xs">{game.channels.join(', ')}</span>
+                  <div className="w-full text-center mt-4">
+                    <span className="text-xs">{game.channels.join(', ')}</span>
                   </div>
                 </div>
               )
