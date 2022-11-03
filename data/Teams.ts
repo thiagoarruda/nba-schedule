@@ -52,7 +52,7 @@ export class Teams {
       logoFile: 'bucks.svg'
     },
     {
-      fullName: 'Los Angeles Clippers',
+      fullName: 'LA Clippers',
       shortName: 'Clippers',
       logoFile: 'clippers.svg'
     },
