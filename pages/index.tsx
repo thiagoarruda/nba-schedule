@@ -1,19 +1,42 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dayjs from 'dayjs'
 import { Teams } from '../data/Teams'
 import { Schedule } from '../data/Schedule'
+import BounceLoader from 'react-spinners/BounceLoader'
 
 const teamLogosPath = '/images/teams/logos'
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [isLoading, setLoading] = useState(false)
+  const dataFetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
+    const fetchData = async () => {
+      setLoading(true)
+      await Schedule.downloadSchedule();
+      setLoading(false)
+    }
+
+    fetchData();
+  }, [])
+
+  if (isLoading) return (
+    <div className="flex h-screen">
+      <div className="m-auto">
+        <BounceLoader color="#475569" />
+      </div>
+    </div>
+  )
 
   const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' });
-
-  const gamesToday = Schedule.getSchedule(currentDate);
+  const gamesToday = Schedule.getDaySchedule(currentDate);
 
   return (
     <div className="container mx-auto mt-6 flex">
