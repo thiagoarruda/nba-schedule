@@ -1,10 +1,25 @@
 import dayjs from 'dayjs'
 
 export interface Game {
-    homeTeam: string;
-    awayTeam: string;
+    homeTeam: TeamData;
+    awayTeam: TeamData;
     channels: string[];
     time: string;
+    status: GameStatus;
+    statusText: string;
+}
+
+export interface TeamData {
+    name: string;
+    wins: number;
+    losses: number;
+    score: number;
+}
+
+export enum GameStatus {
+    SCHEDULED = 1,
+    IN_PROGRESS = 2,
+    FINISHED = 3
 }
 
 export class Schedule {

@@ -4,7 +4,7 @@ import styles from '../styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
 import dayjs from 'dayjs'
 import { Teams } from '../data/Teams'
-import { Schedule } from '../data/Schedule'
+import { GameStatus, Schedule } from '../data/Schedule'
 import BounceLoader from 'react-spinners/BounceLoader'
 
 const teamLogosPath = '/images/teams/logos'
@@ -75,22 +75,32 @@ export default function Home() {
           {!gamesToday && <p className="w-full text-center text-gray-100">Nenhuma transmissão nesta data</p>}
           {gamesToday &&
             gamesToday.map((game, index: number) => {
-              const homeTeam = Teams.getTeam(game.homeTeam);
-              const awayTeam = Teams.getTeam(game.awayTeam);
+              const homeTeam = Teams.getTeam(game.homeTeam.name);
+              const awayTeam = Teams.getTeam(game.awayTeam.name);
               return (
-                <div key={`game-card-${index}`} className="w-full text-gray-100 rounded-xl bg-slate-900 text-middle mb-5 mx-4 p-4">
-                  <div className="grid grid-cols-3 gap-4 text-center items-center">
+                <div key={`game-card-${index}`} className="w-full text-gray-100 rounded-xl bg-slate-800 text-middle mb-3 mx-2 p-4">
+                  <div className="grid grid-cols-6 text-center items-center px-2">
                     <div className="flex flex-col items-center">
-                      <Image className="h-16 w-16" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} width={200} height={200}></Image>
+                      <Image className="h-12 w-12" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} width={200} height={200}></Image>
                       <span className="text-sm mt-2 font-semibold">{homeTeam.shortName}</span>
+                      <span className="text-xs text-gray-400">{game.homeTeam.wins}-{game.homeTeam.losses}</span>
                     </div>
-                    <span className="text-2xl font-bold">{game.time}</span>
+                    {game.status === GameStatus.FINISHED && (
+                      <div className="col-span-4 grid grid-cols-3 items-center px-3">
+                        <span className="text-2xl font-bold tracking-tighter">{game.homeTeam.score}</span>
+                        <span className="text-xs font-bold tracking-tighter">FINAL</span>
+                        <span className="text-2xl font-bold tracking-tighter">{game.awayTeam.score}</span>
+                      </div>
+                    )}
+                    {game.status === GameStatus.IN_PROGRESS && <span className="col-span-4 text-2xl font-bold tracking-tighter">{game.statusText}</span>}
+                    {game.status === GameStatus.SCHEDULED && <span className="col-span-4 text-2xl font-bold tracking-tighter">{game.time}</span>}
                     <div className="flex flex-col items-center">
-                      <Image className="h-16 w-16" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
+                      <Image className="h-12 w-12" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
                       <span className="text-sm mt-2 font-semibold">{awayTeam.shortName}</span>
+                      <span className="text-xs text-gray-400">{game.awayTeam.wins}-{game.awayTeam.losses}</span>
                     </div>
                   </div>
-                  <div className="w-full text-center mt-4">
+                  <div className="w-full text-center mt-2">
                     <span className="text-xs">{game.channels.join(', ')}</span>
                   </div>
                 </div>
