@@ -4,7 +4,7 @@ export interface Game {
     homeTeam: TeamData;
     awayTeam: TeamData;
     channels: string[];
-    time: string;
+    dateTimeUTC: string;
     status: GameStatus;
     statusText: string;
 }
@@ -26,7 +26,7 @@ export class Schedule {
     private static schedule: { [key: string]: Game[] } = {}
 
     public static async downloadSchedule(): Promise<void> {
-        const res = await fetch(`/api/schedule`);        
+        const res = await fetch(`/api/schedule`);
         this.schedule = await res.json();
     }
 
@@ -34,7 +34,11 @@ export class Schedule {
         return this.schedule[this.formatDate(date)];
     }
 
+    public static getLocalGameTime(dateString: string): string {
+        return dayjs(new Date(dateString)).format("HH:mm");
+    }
+
     private static formatDate(date: Date): string {
-        return dayjs(date).format('YYYY-MM-DD')
-    }    
+        return dayjs(date).format('YYYY-MM-DD');
+    }
 }

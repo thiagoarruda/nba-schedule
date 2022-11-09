@@ -38,10 +38,10 @@ async function updateNBASchedule(): Promise<GameSchedule> {
                 const channels = game.broadcasters.intlTvBroadcasters.map((bc: any) => bc.broadcasterDisplay);
                 const homeTeam = getTeamData(game.homeTeam);
                 const awayTeam = getTeamData(game.awayTeam);
-                const time = dayjs(new Date(game.gameDateTimeUTC)).format("HH:mm");
+                const dateTimeUTC = game.gameDateTimeUTC;
                 const status = game.gameStatus;
                 const statusText = game.gameStatusText;
-                daySchedule.push({ homeTeam, awayTeam, channels, time, status, statusText });
+                daySchedule.push({ homeTeam, awayTeam, channels, dateTimeUTC, status, statusText });
             }
         })
 

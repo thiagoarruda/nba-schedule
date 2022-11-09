@@ -93,7 +93,7 @@ export default function Home() {
                       </div>
                     )}
                     {game.status === GameStatus.IN_PROGRESS && <span className="col-span-4 text-2xl font-bold tracking-tighter">{game.statusText}</span>}
-                    {game.status === GameStatus.SCHEDULED && <span className="col-span-4 text-2xl font-bold tracking-tighter">{game.time}</span>}
+                    {game.status === GameStatus.SCHEDULED && <span className="col-span-4 text-2xl font-bold tracking-tighter">{Schedule.getLocalGameTime(game.dateTimeUTC)}</span>}
                     <div className="flex flex-col items-center">
                       <Image className="h-12 w-12" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
                       <span className="text-sm mt-2 font-semibold">{awayTeam.shortName}</span>
