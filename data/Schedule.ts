@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
+import { Scoreboard } from './Scoreboard';
 
 export interface Game {
+    gameId: string;
     homeTeam: TeamData;
     awayTeam: TeamData;
     channels: string[];
@@ -16,6 +18,8 @@ export interface TeamData {
     score: number;
 }
 
+export type GameSchedule = { [key: string]: Game[] };
+
 export enum GameStatus {
     SCHEDULED = 1,
     IN_PROGRESS = 2,
@@ -23,11 +27,40 @@ export enum GameStatus {
 }
 
 export class Schedule {
-    private static schedule: { [key: string]: Game[] } = {}
+    private static schedule: GameSchedule = {}
 
     public static async downloadSchedule(): Promise<void> {
         const res = await fetch(`/api/schedule`);
-        this.schedule = await res.json();
+        const provisionalSchedule: GameSchedule = await res.json();
+        const dateToday = this.formatDate(new Date());
+        const gamesToday = provisionalSchedule[dateToday];
+        if (gamesToday?.length) { 
+            provisionalSchedule[dateToday] = await this.updateTodaysGames(gamesToday);
+        }
+        this.schedule = provisionalSchedule;
+    }
+
+    private static async updateTodaysGames(games: Game[]): Promise<Game[]> {
+        const scoreboard: Scoreboard[] = await (await fetch(`/api/scoreboard`)).json();
+        const updatedGames: Game[] = [];
+
+        scoreboard.forEach(sb => {
+            const game = games.find((game) => game.gameId === sb.gameId);
+
+            if (game) {
+                updatedGames.push({
+                    gameId: sb.gameId,
+                    homeTeam: { ...game.homeTeam, score: sb.homeScore },
+                    awayTeam: { ...game.awayTeam, score: sb.awayScore },
+                    status: sb.status,
+                    statusText: sb.statusText,
+                    dateTimeUTC: game.dateTimeUTC,
+                    channels: game.channels
+                })
+            }
+        })
+
+        return updatedGames;
     }
 
     public static getDaySchedule(date: Date): Game[] {

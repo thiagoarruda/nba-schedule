@@ -6,6 +6,8 @@ import dayjs from 'dayjs'
 import { Teams } from '../data/Teams'
 import { GameStatus, Schedule } from '../data/Schedule'
 import BounceLoader from 'react-spinners/BounceLoader'
+import { Scoreboard } from '../data/Scoreboard'
+import { start } from 'repl'
 
 const teamLogosPath = '/images/teams/logos'
 
@@ -37,6 +39,7 @@ export default function Home() {
 
   const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' });
   const gamesToday = Schedule.getDaySchedule(currentDate);
+
 
   return (
     <div className="container mx-auto mt-6 flex">
@@ -88,12 +91,27 @@ export default function Home() {
                     {game.status === GameStatus.FINISHED && (
                       <div className="col-span-4 grid grid-cols-3 items-center px-3">
                         <span className="text-2xl font-bold tracking-tighter">{game.homeTeam.score}</span>
-                        <span className="text-xs font-bold tracking-tighter">FINAL</span>
+                        <span className="text-xs font-bold">FINAL</span>
                         <span className="text-2xl font-bold tracking-tighter">{game.awayTeam.score}</span>
                       </div>
                     )}
-                    {game.status === GameStatus.IN_PROGRESS && <span className="col-span-4 text-2xl font-bold tracking-tighter">{game.statusText}</span>}
-                    {game.status === GameStatus.SCHEDULED && <span className="col-span-4 text-2xl font-bold tracking-tighter">{Schedule.getLocalGameTime(game.dateTimeUTC)}</span>}
+                    {game.status === GameStatus.IN_PROGRESS && (
+                      <div className="col-span-4 grid grid-cols-3 items-center px-3">
+                        <span className="text-2xl font-bold tracking-tighter">{game.homeTeam.score}</span>
+                        <div>
+                          <p className="text-[0.5rem] font-bold text-red-500">AO VIVO</p>
+                          <p className="text-sm font-bold tracking-tighter">{game.statusText}</p>
+                        </div>
+                        <span className="text-2xl font-bold tracking-tighter">{game.awayTeam.score}</span>
+                      </div>
+                    )}
+                    {game.status === GameStatus.SCHEDULED && !isInPreGame(game.dateTimeUTC) && <span className="col-span-4 text-2xl font-bold tracking-tighter">{Schedule.getLocalGameTime(game.dateTimeUTC)}</span>}
+                    {game.status === GameStatus.SCHEDULED && isInPreGame(game.dateTimeUTC) && (
+                      <div className="col-span-4 items-center px-3">
+                        <p className="text-[0.5rem] font-bold text-red-500">AO VIVO</p>
+                        <p className="text-sm font-bold tracking-tighter">Pré-jogo</p>
+                      </div>
+                    )}
                     <div className="flex flex-col items-center">
                       <Image className="h-12 w-12" src={`${teamLogosPath}/${awayTeam.logoFile}`} alt={awayTeam.fullName} width={200} height={200} ></Image>
                       <span className="text-sm mt-2 font-semibold">{awayTeam.shortName}</span>
@@ -109,7 +127,7 @@ export default function Home() {
           }
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
@@ -119,4 +137,10 @@ function nextDay(currentDate: Date): Date {
 
 function previousDay(currentDate: Date): Date {
   return dayjs(currentDate).subtract(1, 'day').toDate();
+}
+
+function isInPreGame(startDateString: string) {
+  const now = new Date();
+  const startDate = new Date(startDateString);
+  return now > startDate
 }

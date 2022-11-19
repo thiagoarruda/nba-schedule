@@ -1,11 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Game, TeamData } from '../../data/Schedule'
+import { Game, TeamData, GameSchedule } from '../../data/Schedule'
 import dayjs from 'dayjs';
 
 const NBA_SCHEDULE_URL = 'https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_11.json';
 const UPDATE_INTERVAL_MINUTES = 5;
-
-type GameSchedule = { [key: string]: Game[] };
 
 let schedule: GameSchedule;
 let lastUpdated: Date = new Date(0);
@@ -35,13 +33,14 @@ async function updateNBASchedule(): Promise<GameSchedule> {
 
         date.games.forEach((game: any) => {
             if (game.broadcasters.intlTvBroadcasters.length) {
+                const gameId = game.gameId;
                 const channels = game.broadcasters.intlTvBroadcasters.map((bc: any) => bc.broadcasterDisplay);
                 const homeTeam = getTeamData(game.homeTeam);
                 const awayTeam = getTeamData(game.awayTeam);
                 const dateTimeUTC = game.gameDateTimeUTC;
                 const status = game.gameStatus;
                 const statusText = game.gameStatusText;
-                daySchedule.push({ homeTeam, awayTeam, channels, dateTimeUTC, status, statusText });
+                daySchedule.push({ gameId, homeTeam, awayTeam, channels, dateTimeUTC, status, statusText });
             }
         })
 
