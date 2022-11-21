@@ -32,16 +32,14 @@ async function updateNBASchedule(): Promise<GameSchedule> {
         const daySchedule: Game[] = [];
 
         date.games.forEach((game: any) => {
-            if (game.broadcasters.intlTvBroadcasters.length) {
-                const gameId = game.gameId;
-                const channels = game.broadcasters.intlTvBroadcasters.map((bc: any) => bc.broadcasterDisplay);
-                const homeTeam = getTeamData(game.homeTeam);
-                const awayTeam = getTeamData(game.awayTeam);
-                const dateTimeUTC = game.gameDateTimeUTC;
-                const status = game.gameStatus;
-                const statusText = game.gameStatusText;
-                daySchedule.push({ gameId, homeTeam, awayTeam, channels, dateTimeUTC, status, statusText });
-            }
+            const gameId = game.gameId;
+            const channels = game.broadcasters.intlTvBroadcasters.map((bc: any) => bc.broadcasterDisplay);
+            const homeTeam = getTeamData(game.homeTeam);
+            const awayTeam = getTeamData(game.awayTeam);
+            const dateTimeUTC = game.gameDateTimeUTC;
+            const status = game.gameStatus;
+            const statusText = game.gameStatusText;
+            daySchedule.push({ gameId, homeTeam, awayTeam, channels, dateTimeUTC, status, statusText });
         })
 
         if (daySchedule.length) {
