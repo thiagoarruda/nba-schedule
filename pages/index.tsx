@@ -80,8 +80,9 @@ export default function Home() {
             gamesToday.map((game, index: number) => {
               const homeTeam = Teams.getTeam(game.homeTeam.name);
               const awayTeam = Teams.getTeam(game.awayTeam.name);
+              const cardBackgroundColor = game.channels.length ? "bg-sky-800" : "bg-slate-800";
               return (
-                <div key={`game-card-${index}`} className="w-full text-gray-100 rounded-xl bg-slate-800 text-middle mb-3 mx-2 p-4">
+                <div key={`game-card-${index}`} className={`w-full text-gray-100 rounded-xl ${cardBackgroundColor} text-middle mb-3 mx-2 p-4`}>
                   <div className="grid grid-cols-6 text-center items-center px-2">
                     <div className="flex flex-col items-center">
                       <Image className="h-12 w-12" src={`${teamLogosPath}/${homeTeam.logoFile}`} alt={homeTeam.fullName} width={200} height={200}></Image>
@@ -119,7 +120,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="w-full text-center mt-2">
-                    <span className="text-xs">{game.channels.join(', ')}</span>
+                    <span className="text-xs font-semibold">{game.channels.join(', ')}</span>
                   </div>
                 </div>
               )
