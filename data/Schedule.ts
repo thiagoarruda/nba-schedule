@@ -34,33 +34,25 @@ export class Schedule {
         const provisionalSchedule: GameSchedule = await res.json();
         const dateToday = this.formatDate(new Date());
         const gamesToday = provisionalSchedule[dateToday];
-        if (gamesToday?.length) { 
-            provisionalSchedule[dateToday] = await this.updateTodaysGames(gamesToday);
+        if (gamesToday?.length) {
+            await this.updateTodaysGames(gamesToday);            
         }
         this.schedule = provisionalSchedule;
     }
 
-    private static async updateTodaysGames(games: Game[]): Promise<Game[]> {
+    private static async updateTodaysGames(games: Game[]): Promise<void> {
         const scoreboard: Scoreboard[] = await (await fetch(`/api/scoreboard`)).json();
-        const updatedGames: Game[] = [];
 
         scoreboard.forEach(sb => {
             const game = games.find((game) => game.gameId === sb.gameId);
 
             if (game) {
-                updatedGames.push({
-                    gameId: sb.gameId,
-                    homeTeam: { ...game.homeTeam, score: sb.homeScore },
-                    awayTeam: { ...game.awayTeam, score: sb.awayScore },
-                    status: sb.status,
-                    statusText: sb.statusText,
-                    dateTimeUTC: game.dateTimeUTC,
-                    channels: game.channels
-                })
+                game.homeTeam.score = sb.homeScore;
+                game.awayTeam.score = sb.awayScore;
+                game.status = sb.status;
+                game.statusText = sb.statusText;
             }
         })
-
-        return updatedGames;
     }
 
     public static getDaySchedule(date: Date): Game[] {
