@@ -35,9 +35,7 @@ export class Schedule {
     }
 
     public static async updateTodaysGames(): Promise<void> {
-        const dateToday = this.formatDate(new Date());
-        const gamesToday = this.schedule[dateToday];
-        
+        const gamesToday = this.getTodaysGames();
         if (gamesToday.length) {
             const scoreboard: Scoreboard[] = await (await fetch(`/api/scoreboard`)).json();
 
@@ -60,6 +58,20 @@ export class Schedule {
 
     public static getDaySchedule(date: Date): Game[] {
         return this.schedule[this.formatDate(date)];
+    }
+
+    public static getTodaysGames(): Game[] {
+        return this.schedule[this.formatDate(this.getInProgressGamesDate())];
+    }
+
+    public static getInProgressGamesDate(): Date {
+        const today = new Date();
+
+        if (dayjs(today).hour() < 4) {
+            return dayjs().subtract(1, 'day').toDate();
+        }
+
+        return today;
     }
 
     public static getLocalGameTime(dateString: string): string {

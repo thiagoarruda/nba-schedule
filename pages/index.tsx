@@ -10,7 +10,7 @@ import BounceLoader from 'react-spinners/BounceLoader'
 const teamLogosPath = '/images/teams/logos'
 
 export default function Home() {
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState(Schedule.getInProgressGamesDate())
   const [isLoading, setLoading] = useState(false)
   const [gameSchedule, setGameSchedule] = useState({} as GameSchedule)
   const [gamesInCurrentDate, setGamesInCurrentDate] = useState([] as Game[])
@@ -20,25 +20,25 @@ export default function Home() {
     setLoading(true)
     await Schedule.downloadSchedule();
     await Schedule.updateTodaysGames();
-    setGameSchedule({...Schedule.getFullSchedule()});
+    setGameSchedule({ ...Schedule.getFullSchedule() });
     refreshInProgressGames();
     setLoading(false)
   }
 
   const refreshInProgressGames = () => {
-    const gamesToday = Schedule.getDaySchedule(new Date())
+    const gamesToday = Schedule.getTodaysGames();
     if (anyGamesInProgress(gamesToday)) {
       setTimeout(async () => {
         console.log("Updating...");
-        await Schedule.updateTodaysGames();        
-        setGameSchedule({...Schedule.getFullSchedule()});
+        await Schedule.updateTodaysGames();
+        setGameSchedule({ ...Schedule.getFullSchedule() });
 
         refreshInProgressGames();
       }, 15000)
     }
   }
 
-  const anyGamesInProgress = (games: Game[]) => {    
+  const anyGamesInProgress = (games: Game[]) => {
     return games.filter(game => game.status === GameStatus.IN_PROGRESS).length > 0;
   }
 
@@ -60,7 +60,7 @@ export default function Home() {
     </div>
   )
 
-  const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' }); 
+  const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' });
 
   return (
     <div className="container mx-auto mt-6 flex">
