@@ -4,30 +4,53 @@ import styles from '../styles/Home.module.css'
 import { useState, useEffect, useRef } from 'react'
 import dayjs from 'dayjs'
 import { Teams } from '../data/Teams'
-import { GameStatus, Schedule } from '../data/Schedule'
+import { Game, GameSchedule, GameStatus, Schedule } from '../data/Schedule'
 import BounceLoader from 'react-spinners/BounceLoader'
-import { Scoreboard } from '../data/Scoreboard'
-import { start } from 'repl'
 
 const teamLogosPath = '/images/teams/logos'
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [isLoading, setLoading] = useState(false)
+  const [gameSchedule, setGameSchedule] = useState({} as GameSchedule)
+  const [gamesInCurrentDate, setGamesInCurrentDate] = useState([] as Game[])
   const dataFetchedRef = useRef(false);
+
+  const fetchData = async () => {
+    setLoading(true)
+    await Schedule.downloadSchedule();
+    await Schedule.updateTodaysGames();
+    setGameSchedule({...Schedule.getFullSchedule()});
+    refreshInProgressGames();
+    setLoading(false)
+  }
+
+  const refreshInProgressGames = () => {
+    const gamesToday = Schedule.getDaySchedule(new Date())
+    if (anyGamesInProgress(gamesToday)) {
+      setTimeout(async () => {
+        console.log("Updating...");
+        await Schedule.updateTodaysGames();        
+        setGameSchedule({...Schedule.getFullSchedule()});
+
+        refreshInProgressGames();
+      }, 15000)
+    }
+  }
+
+  const anyGamesInProgress = (games: Game[]) => {    
+    return games.filter(game => game.status === GameStatus.IN_PROGRESS).length > 0;
+  }
 
   useEffect(() => {
     if (dataFetchedRef.current) return;
     dataFetchedRef.current = true;
-
-    const fetchData = async () => {
-      setLoading(true)
-      await Schedule.downloadSchedule();
-      setLoading(false)
-    }
-
     fetchData();
   }, [])
+
+  useEffect(() => {
+    setGamesInCurrentDate(gameSchedule[Schedule.formatDate(currentDate)]);
+  }, [gameSchedule, currentDate, isLoading])
 
   if (isLoading) return (
     <div className="flex h-screen">
@@ -37,9 +60,7 @@ export default function Home() {
     </div>
   )
 
-  const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' });
-  const gamesToday = Schedule.getDaySchedule(currentDate);
-
+  const dayOfWeek = currentDate.toLocaleString('pt-BR', { weekday: 'long' }); 
 
   return (
     <div className="container mx-auto mt-6 flex">
@@ -75,9 +96,9 @@ export default function Home() {
           <button className="flex-none px-3 text-3xl" onClick={() => setCurrentDate(nextDay(currentDate))}>{">"}</button>
         </div>
         <div className="flex flex-wrap">
-          {!gamesToday && <p className="w-full text-center text-gray-100">Nenhuma transmissão nesta data</p>}
-          {gamesToday &&
-            gamesToday.map((game, index: number) => {
+          {!gamesInCurrentDate && <p className="w-full text-center text-gray-100">Nenhuma transmissão nesta data</p>}
+          {gamesInCurrentDate &&
+            gamesInCurrentDate.map((game, index: number) => {
               const homeTeam = Teams.getTeam(game.homeTeam.name);
               const awayTeam = Teams.getTeam(game.awayTeam.name);
               const cardBackgroundColor = game.channels.length ? "bg-sky-800" : "bg-slate-800";

@@ -31,28 +31,31 @@ export class Schedule {
 
     public static async downloadSchedule(): Promise<void> {
         const res = await fetch(`/api/schedule`);
-        const provisionalSchedule: GameSchedule = await res.json();
-        const dateToday = this.formatDate(new Date());
-        const gamesToday = provisionalSchedule[dateToday];
-        if (gamesToday?.length) {
-            await this.updateTodaysGames(gamesToday);            
-        }
-        this.schedule = provisionalSchedule;
+        this.schedule = await res.json();
     }
 
-    private static async updateTodaysGames(games: Game[]): Promise<void> {
-        const scoreboard: Scoreboard[] = await (await fetch(`/api/scoreboard`)).json();
+    public static async updateTodaysGames(): Promise<void> {
+        const dateToday = this.formatDate(new Date());
+        const gamesToday = this.schedule[dateToday];
+        
+        if (gamesToday.length) {
+            const scoreboard: Scoreboard[] = await (await fetch(`/api/scoreboard`)).json();
 
-        scoreboard.forEach(sb => {
-            const game = games.find((game) => game.gameId === sb.gameId);
+            scoreboard.forEach(sb => {
+                const game = gamesToday.find((game) => game.gameId === sb.gameId);
 
-            if (game) {
-                game.homeTeam.score = sb.homeScore;
-                game.awayTeam.score = sb.awayScore;
-                game.status = sb.status;
-                game.statusText = sb.statusText;
-            }
-        })
+                if (game) {
+                    game.homeTeam.score = sb.homeScore;
+                    game.awayTeam.score = sb.awayScore;
+                    game.status = sb.status;
+                    game.statusText = sb.statusText;
+                }
+            })
+        }
+    }
+
+    public static getFullSchedule(): GameSchedule {
+        return this.schedule;
     }
 
     public static getDaySchedule(date: Date): Game[] {
@@ -63,7 +66,7 @@ export class Schedule {
         return dayjs(new Date(dateString)).format("HH:mm");
     }
 
-    private static formatDate(date: Date): string {
+    public static formatDate(date: Date): string {
         return dayjs(date).format('YYYY-MM-DD');
     }
 }
