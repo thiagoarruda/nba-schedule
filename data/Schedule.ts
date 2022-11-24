@@ -57,11 +57,11 @@ export class Schedule {
     }
 
     public static getDaySchedule(date: Date): Game[] {
-        return this.schedule[this.formatDate(date)];
+        return this.schedule[this.formatDate(date)] ?? [];
     }
 
     public static getTodaysGames(): Game[] {
-        return this.schedule[this.formatDate(this.getInProgressGamesDate())];
+        return this.schedule[this.formatDate(this.getInProgressGamesDate())] ?? [];
     }
 
     public static getInProgressGamesDate(): Date {
